@@ -1,14 +1,12 @@
 const path = require('path')
 const exec = require('shelljs.exec')
-const ping = require('ping')
+const fs = require('fs')
+const Tail = require('tail').Tail
+
 // GITHUB
 const core = require('@actions/core')
 
 try {
-  // Get input defined in action metadata file
-  const pingURL = core.getInput('PING_URL').trim()
-    ? core.getInput('PING_URL').trim()
-    : '127.0.0.1'
   const fileOVPN = core.getInput('FILE_OVPN').trim()
     ? core.getInput('FILE_OVPN').trim()
     : './.github/vpn/config.ovpn'
@@ -18,6 +16,9 @@ try {
   const tlsKey = core.getInput('TLS_KEY').trim()
     ? core.getInput('TLS_KEY').trim()
     : process.env.TLS_KEY.trim()
+  const timeout = core.getInput('TIMEOUT').trim()
+      ? core.getInput('TIMEOUT').trim()
+      : 15000
 
   if (process.env.CA_CRT == null) {
     core.setFailed(`Can't get ca cert please add CA_CRT in secret`)
@@ -59,25 +60,31 @@ try {
   createFile('user.crt', process.env.USER_CRT.trim())
   createFile('user.key', process.env.USER_KEY.trim())
 
-  if (exec(`sudo openvpn --config ${finalPath} --daemon`).code !== 0) {
-    core.setFailed(`Can't setup config ${finalPath}`)
+  fs.writeFileSync('openvpn.log', '');
+  const tail = new Tail('openvpn.log');
+  tail.on('line', (data) => {
+    core.info(data)
+    if (data.includes('Initialization Sequence Completed')) {
+      tail.unwatch()
+      clearTimeout(timer)
+    }
+  })
+
+  const timer = setTimeout(() => {
+    core.setFailed('VPN connection timeout.')
+    tail.unwatch()
+    process.exit(1)
+  }, +timeout)
+
+  core.info('Starting OpenVPN command');
+  if (exec(`sudo openvpn --config ${finalPath} --log openvpn.log --daemon`).code !== 0) {
+    core.error(fs.readFileSync('openvpn.log', 'utf8'));
+    core.setFailed(`Can't setup config ${finalPath}`);
+    tail.unwatch();
     process.exit(1)
   }
-
-  ping.promise
-    .probe(pingURL, {
-      timeout: 15,
-      min_reply: 15,
-    })
-    .then(function (res) {
-      if (res.alive) {
-        core.info('Connect vpn passed')
-        core.setOutput('STATUS', true)
-      } else {
-        core.setFailed('Connect vpn failed')
-        core.setOutput('STATUS', false)
-      }
-    })
+  core.info('OpenVPN command executed');
 } catch (error) {
   core.setFailed(error.message)
+  process.exit(1)
 }

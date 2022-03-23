@@ -1,6 +1,6 @@
 <div align="center"><h1>Actions Connect Open VPN</h1></div>
 
-This action is a connect ovpn script
+This action is a connect ovpn script with additional debug, timeout and ping function deleted
 
 ## Example file `.ovpn` to connect vpn
 
@@ -14,7 +14,6 @@ example.
 | Key         | Value                                                                                                                           | Suggested Type | Required | Default         |
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------- | -------------- | -------- | --------------- |
 | `FILE_OVPN` | Location file open vpn and .                                                                                                    | `env`          | **Yes**  | `./config.ovpn` |
-| `PING_URL`  | URL for check status vpn connect pass or fail                                                                                   | `env`          | **Yes**  | `127.0.0.1`     |
 | `SECRET`    | Username password for access vpn`(Encode base 64 before set secret.)`[How to encode base 64 ?](https://www.base64encode.org/).  | `secret env`   | No       | `''`            |
 | `TLS_KEY`   | Tls-crypt for access vpn `(Encode base 64 before set secret.)`[How to encode base 64 ?](https://www.base64encode.org/).         | `secret env`   | No       | `''`            |
 
@@ -45,10 +44,9 @@ example.
       - name: Install Open VPN
         run: sudo apt-get install openvpn
       - name: Connect VPN
-        uses: golfzaptw/action-connect-ovpn@master
+        uses: artturik/action-connect-ovpn@main
         id: connect_vpn
         with:
-          PING_URL: '127.0.0.1'
           FILE_OVPN: '.github/vpn/config.ovpn'
           SECRET: ${{ secrets.SECRET_USERNAME_PASSWORD }}
           TLS_KEY: ${{ secrets.TLS_KEY }}
@@ -56,8 +54,6 @@ example.
           CA_CRT: ${{ secrets.CA_CRT}}
           USER_CRT: ${{ secrets.USER_CRT }}
           USER_KEY: ${{ secrets.USER_KEY }}
-      - name: Check Connect VPN
-        run: echo ${{ steps.connect_vpn.outputs.STATUS }}
       - name: kill vpn
         if: always()
         run: sudo killall openvpn

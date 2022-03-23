@@ -18,14 +18,16 @@
     "@zeit/ncc": "^0.22.3",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-import": "^2.24.0",
     "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-import": "^2.24.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.3.1",
     "eslint-plugin-standard": "^5.0.0",
     "path": "^0.12.7",
-    "ping": "^0.4.1",
     "prettier": "^2.3.2",
     "shelljs.exec": "^1.1.8"
+  },
+  "dependencies": {
+    "tail": "^2.2.4"
   }
 }
