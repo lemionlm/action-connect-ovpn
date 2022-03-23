@@ -49,10 +49,10 @@ try {
     }
   }
 
-  if (secret !== '') {
+  if (secret) {
     createFile('secret.txt', secret)
   }
-  if (tlsKey !== '') {
+  if (tlsKey) {
     createFile('tls.key', tlsKey)
   }
 
