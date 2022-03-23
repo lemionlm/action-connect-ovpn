@@ -1,5 +1,5 @@
-name: 'Connect-VPN'
-description: 'Connect VPN'
+name: 'Connect-VPN-debug-and-timeout'
+description: 'Connect VPN + debug and timeout'
 branding:
   icon: 'cast'
   color: 'green'
