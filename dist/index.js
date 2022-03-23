@@ -384,16 +384,18 @@ const Tail = __webpack_require__(88).Tail
 const core = __webpack_require__(470)
 
 try {
-  const fileOVPN = core.getInput('FILE_OVPN').trim()
-    ? core.getInput('FILE_OVPN').trim()
-    : './.github/vpn/config.ovpn'
-  const secret = core.getInput('SECRET').trim()
-    ? core.getInput('SECRET').trim()
-    : process.env.SECRET_USERNAME_PASSWORD.trim()
-  const tlsKey = core.getInput('TLS_KEY').trim()
-    ? core.getInput('TLS_KEY').trim()
-    : process.env.TLS_KEY.trim()
-  const timeout = 15000;
+  const fileOVPN = core.getInput('FILE_OVPN') || './.github/vpn/config.ovpn'
+  const timeout = core.getInput('TIMEOUT') || 15000;
+
+  let secret = core.getInput('SECRET') || process.env.SECRET_USERNAME_PASSWORD
+  if(secret){
+    secret = secret.trim()
+  }
+
+  let tlsKey = core.getInput('TLS_KEY') || process.env.TLS_KEY
+  if(tlsKey){
+    tlsKey = tlsKey.trim()
+  }
 
   if (process.env.CA_CRT == null) {
     core.setFailed(`Can't get ca cert please add CA_CRT in secret`)
