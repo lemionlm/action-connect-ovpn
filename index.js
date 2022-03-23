@@ -16,9 +16,7 @@ try {
   const tlsKey = core.getInput('TLS_KEY').trim()
     ? core.getInput('TLS_KEY').trim()
     : process.env.TLS_KEY.trim()
-  const timeout = core.getInput('TIMEOUT').trim()
-      ? core.getInput('TIMEOUT').trim()
-      : 15000
+  const timeout = 15000;
 
   if (process.env.CA_CRT == null) {
     core.setFailed(`Can't get ca cert please add CA_CRT in secret`)
